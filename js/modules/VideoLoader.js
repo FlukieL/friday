@@ -7,6 +7,8 @@ class VideoLoader {
     constructor(youtubeEmbed, animations) {
         this.youtubeEmbed = youtubeEmbed;
         this.animations = animations;
+        this.videos = [];
+        this.videosBySeason = {};
     }
 
     /**
@@ -32,19 +34,22 @@ class VideoLoader {
             container.classList.remove('videos-grid');
             container.classList.add('videos-container-inner');
 
+            // Store videos for URL handling
+            this.videos = videosWithTitles;
+
             // Group videos by season
-            const videosBySeason = {};
+            this.videosBySeason = {};
             videosWithTitles.forEach(video => {
                 const season = video.season || '1';
-                if (!videosBySeason[season]) {
-                    videosBySeason[season] = [];
+                if (!this.videosBySeason[season]) {
+                    this.videosBySeason[season] = [];
                 }
-                videosBySeason[season].push(video);
+                this.videosBySeason[season].push(video);
             });
 
             // Render videos grouped by season
             let globalIndex = 0;
-            Object.keys(videosBySeason).sort().forEach(season => {
+            Object.keys(this.videosBySeason).sort().forEach(season => {
                 // Create season heading
                 const seasonHeading = document.createElement('h2');
                 seasonHeading.className = 'season-heading';
@@ -56,8 +61,8 @@ class VideoLoader {
                 seasonGrid.className = 'videos-grid';
                 
                 // Render videos for this season
-                videosBySeason[season].forEach((video, index) => {
-                    const videoCard = this.createVideoCard(video);
+                this.videosBySeason[season].forEach((video, index) => {
+                    const videoCard = this.createVideoCard(video, season, index + 1);
                     this.animations.setFadeInDelay(videoCard, globalIndex * 50);
                     seasonGrid.appendChild(videoCard);
                     globalIndex++;
@@ -79,9 +84,11 @@ class VideoLoader {
     /**
      * Creates a video card element (title only, expands on click)
      * @param {Object} video - Video data object
+     * @param {string} season - Season number
+     * @param {number} videoNumber - Video number within the season
      * @returns {HTMLElement}
      */
-    createVideoCard(video) {
+    createVideoCard(video, season, videoNumber) {
         const card = document.createElement('div');
         card.className = 'video-card';
         card.dataset.videoId = video.id || this.youtubeEmbed.extractVideoId(video.url);
@@ -94,6 +101,8 @@ class VideoLoader {
 
             // Store video data for expansion
             card.dataset.videoData = JSON.stringify(video);
+            card.dataset.season = season;
+            card.dataset.videoNumber = videoNumber;
 
             // Add thumbnail
             const thumbnailContainer = document.createElement('div');
@@ -146,7 +155,7 @@ class VideoLoader {
             const handleClick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                this.expandVideo(card, video);
+                this.expandVideo(card, video, season, videoNumber);
             };
             
             card.addEventListener('click', handleClick);
@@ -154,7 +163,7 @@ class VideoLoader {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.expandVideo(card, video);
+                    this.expandVideo(card, video, season, videoNumber);
                 }
             });
 
@@ -175,8 +184,10 @@ class VideoLoader {
      * Expands a video to full screen
      * @param {HTMLElement} card - The video card element
      * @param {Object} video - Video data object
+     * @param {string} season - Season number
+     * @param {number} videoNumber - Video number within the season
      */
-    expandVideo(card, video) {
+    expandVideo(card, video, season, videoNumber) {
         // Prevent multiple overlays
         const existingOverlay = document.querySelector('.video-overlay');
         if (existingOverlay) {
@@ -250,6 +261,9 @@ class VideoLoader {
         document.body.appendChild(overlay);
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
 
+        // Update URL with video information
+        this.updateURL(season, videoNumber);
+
         // Trigger animation - use double requestAnimationFrame for better browser compatibility
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -259,12 +273,50 @@ class VideoLoader {
     }
 
     /**
+     * Updates the URL with the current video selection
+     * @param {string} season - Season number
+     * @param {number} videoNumber - Video number within the season
+     */
+    updateURL(season, videoNumber) {
+        const url = new URL(window.location);
+        url.searchParams.set('tab', 'videos');
+        url.searchParams.set('season', season);
+        url.searchParams.set('video', videoNumber.toString());
+        window.history.pushState({ tab: 'videos', season, video: videoNumber }, '', url);
+    }
+
+    /**
+     * Expands a video based on URL parameters
+     * @param {string} season - Season number
+     * @param {number} videoNumber - Video number within the season
+     */
+    expandVideoFromURL(season, videoNumber) {
+        if (!this.videosBySeason[season] || !this.videosBySeason[season][videoNumber - 1]) {
+            return;
+        }
+
+        const video = this.videosBySeason[season][videoNumber - 1];
+        const card = document.querySelector(`[data-season="${season}"][data-video-number="${videoNumber}"]`);
+        
+        if (card) {
+            this.expandVideo(card, video, season, videoNumber);
+        }
+    }
+
+    /**
      * Closes the expanded video
      * @param {HTMLElement} overlay - The overlay element
      */
     closeVideo(overlay) {
         overlay.classList.remove('active');
         overlay.classList.add('closing');
+        
+        // Update URL to remove video parameters but keep tab
+        const url = new URL(window.location);
+        const currentTab = url.searchParams.get('tab') || 'videos';
+        url.searchParams.delete('season');
+        url.searchParams.delete('video');
+        window.history.pushState({ tab: currentTab }, '', url);
         
         setTimeout(() => {
             document.body.removeChild(overlay);
@@ -283,4 +335,5 @@ class VideoLoader {
 }
 
 export default VideoLoader;
+
 

@@ -95,10 +95,30 @@ class TabManager {
 
         this.activeTab = tabName;
 
+        // Update URL
+        this.updateURL(tabName);
+
         // Dispatch custom event for tab change
         window.dispatchEvent(new CustomEvent('tabChanged', { 
             detail: { tabName } 
         }));
+    }
+
+    /**
+     * Updates the URL with the current tab
+     * @param {string} tabName - Name of the active tab
+     */
+    updateURL(tabName) {
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabName);
+        
+        // If switching away from videos, remove season and video params
+        if (tabName !== 'videos') {
+            url.searchParams.delete('season');
+            url.searchParams.delete('video');
+        }
+        
+        window.history.pushState({ tab: tabName }, '', url);
     }
 
     /**
@@ -136,7 +156,18 @@ class TabManager {
     getActiveTab() {
         return this.activeTab;
     }
+
+    /**
+     * Switches to a tab based on URL parameters
+     * @param {string} tabName - Name of the tab to switch to
+     */
+    async switchTabFromURL(tabName) {
+        if (tabName && tabName !== this.activeTab) {
+            await this.switchTab(tabName);
+        }
+    }
 }
 
 export default TabManager;
+
 

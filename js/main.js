@@ -43,20 +43,49 @@ class FridaySagaApp {
             // Load initial tab content (videos)
             await this.loadVideos();
 
+            // Read URL parameters and restore state
+            await this.restoreStateFromURL();
+
             // Listen for tab changes to load content on demand
             window.addEventListener('tabChanged', (event) => {
                 this.handleTabChange(event.detail.tabName);
             });
 
-            // Load content for initially active tab if not videos
-            const activeTab = this.tabManager.getActiveTab();
-            if (activeTab && activeTab !== 'videos') {
-                await this.handleTabChange(activeTab);
-            }
+            // Handle browser back/forward navigation
+            window.addEventListener('popstate', (event) => {
+                this.restoreStateFromURL();
+            });
 
         } catch (error) {
             console.error('Error initialising application:', error);
             this.showError('Failed to initialise application. Please refresh the page.');
+        }
+    }
+
+    /**
+     * Restores application state from URL parameters
+     */
+    async restoreStateFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        const season = urlParams.get('season');
+        const video = urlParams.get('video');
+
+        // Restore tab if specified in URL
+        if (tab) {
+            await this.tabManager.switchTabFromURL(tab);
+            await this.handleTabChange(tab);
+        }
+
+        // Restore video if season and video are specified
+        if (tab === 'videos' && season && video) {
+            const videoNumber = parseInt(video, 10);
+            if (!isNaN(videoNumber)) {
+                // Wait a bit for videos to be rendered
+                setTimeout(() => {
+                    this.videoLoader.expandVideoFromURL(season, videoNumber);
+                }, 100);
+            }
         }
     }
 
@@ -195,4 +224,5 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
 
