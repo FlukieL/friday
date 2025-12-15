@@ -247,13 +247,7 @@ class VideoLoader {
             embedContainer.innerHTML = '<p>Failed to load video embed</p>';
         }
 
-        // Add title to expanded view
-        const titleElement = document.createElement('div');
-        titleElement.className = 'video-expanded-title';
-        titleElement.textContent = video.title || 'Untitled Video';
-
         expandedContainer.appendChild(closeButton);
-        expandedContainer.appendChild(titleElement);
         expandedContainer.appendChild(embedContainer);
         overlay.appendChild(expandedContainer);
 
