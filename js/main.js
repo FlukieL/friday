@@ -182,3 +182,4 @@ class FridaySagaApp {
 // Initialise the application
 const app = new FridaySagaApp();
 app.init();
+
