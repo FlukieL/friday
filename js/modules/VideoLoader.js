@@ -27,14 +27,43 @@ class VideoLoader {
             // Fetch titles for videos that don't have them
             const videosWithTitles = await this.youtubeEmbed.fetchTitlesForVideos(videos);
 
-            // Clear container
+            // Clear container and change it from grid to block container
             container.innerHTML = '';
+            container.classList.remove('videos-grid');
+            container.classList.add('videos-container-inner');
 
-            // Render each video
-            videosWithTitles.forEach((video, index) => {
-                const videoCard = this.createVideoCard(video);
-                this.animations.setFadeInDelay(videoCard, index * 50);
-                container.appendChild(videoCard);
+            // Group videos by season
+            const videosBySeason = {};
+            videosWithTitles.forEach(video => {
+                const season = video.season || '1';
+                if (!videosBySeason[season]) {
+                    videosBySeason[season] = [];
+                }
+                videosBySeason[season].push(video);
+            });
+
+            // Render videos grouped by season
+            let globalIndex = 0;
+            Object.keys(videosBySeason).sort().forEach(season => {
+                // Create season heading
+                const seasonHeading = document.createElement('h2');
+                seasonHeading.className = 'season-heading';
+                seasonHeading.textContent = season;
+                container.appendChild(seasonHeading);
+
+                // Create season grid container
+                const seasonGrid = document.createElement('div');
+                seasonGrid.className = 'videos-grid';
+                
+                // Render videos for this season
+                videosBySeason[season].forEach((video, index) => {
+                    const videoCard = this.createVideoCard(video);
+                    this.animations.setFadeInDelay(videoCard, globalIndex * 50);
+                    seasonGrid.appendChild(videoCard);
+                    globalIndex++;
+                });
+
+                container.appendChild(seasonGrid);
             });
 
             // Trigger staggered animations

@@ -132,11 +132,33 @@ main {
     width: 100%;
 }
 
+.videos-container-inner {
+    width: 100%;
+    display: block;
+}
+
+.season-heading {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    text-align: center;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+}
+
+.season-heading:first-child {
+    margin-top: 0;
+}
+
 .videos-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
     margin-top: 1rem;
+    margin-bottom: 2rem;
 }
 
 /* Responsive Grid Layout */
