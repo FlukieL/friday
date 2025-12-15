@@ -305,6 +305,9 @@ class VideoLoader {
         document.body.appendChild(overlay);
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
 
+        // Setup auto-hide for controls
+        this.setupAutoHideControls(overlay, closeButton, navContainer);
+
         // Update URL with video information
         this.updateURL(season, videoNumber);
 
@@ -314,6 +317,64 @@ class VideoLoader {
                 overlay.classList.add('active');
             });
         });
+    }
+
+    /**
+     * Sets up auto-hide functionality for video controls
+     * @param {HTMLElement} overlay - The overlay element
+     * @param {HTMLElement} closeButton - The close button
+     * @param {HTMLElement} navContainer - The navigation container
+     */
+    setupAutoHideControls(overlay, closeButton, navContainer) {
+        let hideTimeout;
+        const hideDelay = 3000; // 3 seconds of inactivity
+
+        const showControls = () => {
+            closeButton.classList.remove('hidden');
+            navContainer.classList.remove('hidden');
+            
+            // Clear existing timeout
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+            
+            // Set new timeout to hide controls
+            hideTimeout = setTimeout(() => {
+                closeButton.classList.add('hidden');
+                navContainer.classList.add('hidden');
+            }, hideDelay);
+        };
+
+        const hideControls = () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+            closeButton.classList.add('hidden');
+            navContainer.classList.add('hidden');
+        };
+
+        // Show controls on mouse movement
+        overlay.addEventListener('mousemove', showControls);
+        overlay.addEventListener('mouseenter', showControls);
+        
+        // Hide controls when mouse leaves overlay
+        overlay.addEventListener('mouseleave', hideControls);
+
+        // Show controls on touch (mobile)
+        overlay.addEventListener('touchstart', showControls);
+
+        // Show controls when interacting with buttons
+        closeButton.addEventListener('mouseenter', showControls);
+        navContainer.addEventListener('mouseenter', showControls);
+
+        // Initial timeout to hide controls
+        hideTimeout = setTimeout(() => {
+            closeButton.classList.add('hidden');
+            navContainer.classList.add('hidden');
+        }, hideDelay);
+
+        // Store cleanup function on overlay
+        overlay.dataset.autoHideCleanup = 'true';
     }
 
     /**
@@ -461,6 +522,20 @@ class VideoLoader {
 
         // Update aria-label
         overlay.setAttribute('aria-label', newVideo.title || 'Video Player');
+
+        // Reset auto-hide controls (show them again after navigation)
+        const closeButton = expandedContainer.querySelector('.video-close-button');
+        if (closeButton && navContainer && overlay.dataset.autoHideCleanup === 'true') {
+            closeButton.classList.remove('hidden');
+            navContainer.classList.remove('hidden');
+            // Trigger mouse move to restart auto-hide timer
+            const mouseEvent = new MouseEvent('mousemove', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            overlay.dispatchEvent(mouseEvent);
+        }
     }
 
     /**

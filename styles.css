@@ -470,8 +470,14 @@ main {
     align-items: center;
     justify-content: center;
     color: var(--text-color);
-    transition: var(--transition);
+    transition: opacity 0.3s ease, visibility 0.3s ease, var(--transition);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.video-close-button.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .video-close-button:hover {
@@ -516,6 +522,13 @@ main {
     flex-direction: column;
     gap: 0.75rem;
     z-index: 10001;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.video-nav-container.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .video-nav-button {
@@ -579,11 +592,10 @@ main {
     }
 }
 
-/* Desktop - position outside container when there's room */
-@media (min-width: 1400px) {
+/* Desktop sizing */
+@media (min-width: 1024px) {
     .video-nav-container {
-        right: -60px;
-        gap: 1rem;
+        right: 1rem;
     }
     
     .video-nav-button {
