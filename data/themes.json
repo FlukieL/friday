@@ -1,0 +1,31 @@
+{
+  "themes": [
+    {
+      "name": "Weekly Friday Releases",
+      "description": "The Friday Saga is characterised by its consistent weekly release schedule, with new episodes premiering every Friday. This regularity creates anticipation and establishes a rhythm for viewers.",
+      "examples": [
+        "Each video is released on a Friday, maintaining the series' namesake",
+        "The weekly format allows for ongoing narrative development",
+        "Viewers can expect new content at a predictable interval"
+      ]
+    },
+    {
+      "name": "Comedic Storytelling",
+      "description": "The series employs humour as a central element, blending entertainment with narrative progression. The comedic elements help make the content engaging and memorable.",
+      "examples": [
+        "Light-hearted moments interspersed throughout episodes",
+        "Character interactions that provide comedic relief",
+        "Situational humour that advances the plot"
+      ]
+    },
+    {
+      "name": "Character Development",
+      "description": "Over the course of the series, characters like Stephen the TV Reporter evolve and develop, creating a sense of continuity and growth throughout the saga.",
+      "examples": [
+        "Recurring characters appear across multiple episodes",
+        "Character relationships and dynamics develop over time",
+        "Each character brings unique perspectives to the narrative"
+      ]
+    }
+  ]
+}

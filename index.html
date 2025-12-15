@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friday Saga</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Friday Saga</h1>
+        <p class="subtitle">A series of videos posted every Friday</p>
+    </header>
+
+    <nav class="tabs" role="tablist">
+        <button class="tab-button active" data-tab="videos" role="tab" aria-selected="true">Videos</button>
+        <button class="tab-button" data-tab="characters" role="tab" aria-selected="false">Characters</button>
+        <button class="tab-button" data-tab="themes" role="tab" aria-selected="false">Themes</button>
+        <button class="tab-button" data-tab="jokes" role="tab" aria-selected="false">Recurring Jokes</button>
+    </nav>
+
+    <main>
+        <section id="videos-tab" class="tab-content active" role="tabpanel">
+            <div class="videos-container">
+                <div class="videos-grid" id="videos-grid">
+                    <!-- Videos will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="characters-tab" class="tab-content" role="tabpanel">
+            <div class="content-container" id="characters-content">
+                <!-- Characters will be loaded here -->
+            </div>
+        </section>
+
+        <section id="themes-tab" class="tab-content" role="tabpanel">
+            <div class="content-container" id="themes-content">
+                <!-- Themes will be loaded here -->
+            </div>
+        </section>
+
+        <section id="jokes-tab" class="tab-content" role="tabpanel">
+            <div class="content-container" id="jokes-content">
+                <!-- Recurring jokes will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

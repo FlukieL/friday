@@ -1,0 +1,34 @@
+{
+  "jokes": [
+    {
+      "name": "Friday Release Pattern",
+      "description": "The consistent pattern of releasing videos every Friday has become a running element of the series itself, with the timing becoming part of the series' identity.",
+      "occurrences": [
+        "Referenced in multiple episodes",
+        "Becomes a meta-commentary on the series format",
+        "Creates anticipation for weekly releases"
+      ],
+      "context": "The 'Friday' aspect is both a scheduling reality and a thematic element of the saga."
+    },
+    {
+      "name": "Stephen's Reporting Style",
+      "description": "Stephen the TV Reporter's distinctive reporting approach, which blends professional journalism with comedic elements, has become a recurring source of humour throughout the series.",
+      "occurrences": [
+        "Appears in multiple episodes as a reporter",
+        "His commentary often provides comedic moments",
+        "The contrast between professional reporting and comedic situations creates humour"
+      ],
+      "context": "Stephen's character from LUKETV brings a unique perspective that often leads to humorous situations."
+    },
+    {
+      "name": "Meta-Narrative Elements",
+      "description": "The series occasionally breaks the fourth wall or includes self-referential humour about the nature of the Friday Saga itself, creating a layer of meta-comedy.",
+      "occurrences": [
+        "References to the weekly release schedule",
+        "Self-aware commentary about the series format",
+        "Acknowledgment of the ongoing nature of the saga"
+      ],
+      "context": "These elements add depth and self-awareness to the series while maintaining its comedic tone."
+    }
+  ]
+}
