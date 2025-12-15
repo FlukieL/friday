@@ -195,12 +195,18 @@ class VideoLoader {
             return;
         }
 
+        // Find current video index in flat array
+        const currentIndex = this.videos.findIndex(v => v.id === video.id);
+        const hasPrevious = currentIndex > 0;
+        const hasNext = currentIndex < this.videos.length - 1;
+
         // Create overlay
         const overlay = document.createElement('div');
         overlay.className = 'video-overlay';
         overlay.setAttribute('role', 'dialog');
         overlay.setAttribute('aria-modal', 'true');
         overlay.setAttribute('aria-label', video.title || 'Video Player');
+        overlay.dataset.currentVideoIndex = currentIndex.toString();
 
         // Create expanded container
         const expandedContainer = document.createElement('div');
@@ -247,8 +253,52 @@ class VideoLoader {
             embedContainer.innerHTML = '<p>Failed to load video embed</p>';
         }
 
+        // Create navigation arrows (only on desktop when there's room)
+        const navContainer = document.createElement('div');
+        navContainer.className = 'video-nav-container';
+
+        // Previous button
+        const prevButton = document.createElement('button');
+        prevButton.className = 'video-nav-button video-nav-prev';
+        prevButton.setAttribute('aria-label', 'Previous video');
+        prevButton.innerHTML = '‹';
+        prevButton.disabled = !hasPrevious;
+        
+        const handlePrevClick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (hasPrevious && currentIndex > 0) {
+                this.navigateToVideo(overlay, currentIndex - 1);
+            }
+        };
+        
+        prevButton.addEventListener('click', handlePrevClick);
+        prevButton.addEventListener('touchend', handlePrevClick);
+
+        // Next button
+        const nextButton = document.createElement('button');
+        nextButton.className = 'video-nav-button video-nav-next';
+        nextButton.setAttribute('aria-label', 'Next video');
+        nextButton.innerHTML = '›';
+        nextButton.disabled = !hasNext;
+        
+        const handleNextClick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (hasNext && currentIndex < this.videos.length - 1) {
+                this.navigateToVideo(overlay, currentIndex + 1);
+            }
+        };
+        
+        nextButton.addEventListener('click', handleNextClick);
+        nextButton.addEventListener('touchend', handleNextClick);
+
+        navContainer.appendChild(prevButton);
+        navContainer.appendChild(nextButton);
+
         expandedContainer.appendChild(closeButton);
         expandedContainer.appendChild(embedContainer);
+        expandedContainer.appendChild(navContainer);
         overlay.appendChild(expandedContainer);
 
         // Add to body
@@ -295,6 +345,122 @@ class VideoLoader {
         if (card) {
             this.expandVideo(card, video, season, videoNumber);
         }
+    }
+
+    /**
+     * Navigates to a different video in the expanded view
+     * @param {HTMLElement} overlay - The current overlay element
+     * @param {number} videoIndex - Index of the video to navigate to
+     */
+    navigateToVideo(overlay, videoIndex) {
+        if (videoIndex < 0 || videoIndex >= this.videos.length) {
+            return;
+        }
+
+        const newVideo = this.videos[videoIndex];
+        if (!newVideo) {
+            return;
+        }
+
+        const newSeason = newVideo.season || '1';
+        
+        // Find the video number within the season
+        const seasonVideos = this.videosBySeason[newSeason] || [];
+        const seasonIndex = seasonVideos.findIndex(v => v.id === newVideo.id);
+        
+        if (seasonIndex === -1) {
+            console.error('Video not found in season:', newVideo.id, newSeason);
+            return;
+        }
+        
+        const videoNumber = seasonIndex + 1;
+
+        // Get the expanded container and embed container
+        const expandedContainer = overlay.querySelector('.video-expanded-container');
+        if (!expandedContainer) {
+            return;
+        }
+
+        const oldEmbedContainer = expandedContainer.querySelector('.video-embed-container');
+        if (!oldEmbedContainer) {
+            return;
+        }
+
+        // Create new embed
+        let newEmbedContainer;
+        try {
+            newEmbedContainer = this.youtubeEmbed.createEmbed(newVideo);
+            newEmbedContainer.classList.add('expanded-embed');
+        } catch (error) {
+            console.error('Error creating embed:', error);
+            newEmbedContainer = document.createElement('div');
+            newEmbedContainer.className = 'video-error';
+            newEmbedContainer.innerHTML = '<p>Failed to load video embed</p>';
+        }
+
+        // Replace the old embed with the new one
+        oldEmbedContainer.parentNode.replaceChild(newEmbedContainer, oldEmbedContainer);
+
+        // Update navigation buttons - store current index on overlay for easy access
+        overlay.dataset.currentVideoIndex = videoIndex;
+        const navContainer = expandedContainer.querySelector('.video-nav-container');
+        if (navContainer) {
+            const prevButton = navContainer.querySelector('.video-nav-prev');
+            const nextButton = navContainer.querySelector('.video-nav-next');
+            
+            const hasPrevious = videoIndex > 0;
+            const hasNext = videoIndex < this.videos.length - 1;
+            
+            if (prevButton) {
+                prevButton.disabled = !hasPrevious;
+                // Remove all existing listeners by cloning (simplest way)
+                const newPrevButton = prevButton.cloneNode(true);
+                prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+                
+                if (hasPrevious) {
+                    newPrevButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const currentIdx = parseInt(overlay.dataset.currentVideoIndex || '0', 10);
+                        this.navigateToVideo(overlay, currentIdx - 1);
+                    });
+                    newPrevButton.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const currentIdx = parseInt(overlay.dataset.currentVideoIndex || '0', 10);
+                        this.navigateToVideo(overlay, currentIdx - 1);
+                    });
+                }
+            }
+            
+            if (nextButton) {
+                nextButton.disabled = !hasNext;
+                // Remove all existing listeners by cloning (simplest way)
+                const newNextButton = nextButton.cloneNode(true);
+                nextButton.parentNode.replaceChild(newNextButton, nextButton);
+                
+                if (hasNext) {
+                    newNextButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const currentIdx = parseInt(overlay.dataset.currentVideoIndex || '0', 10);
+                        this.navigateToVideo(overlay, currentIdx + 1);
+                    });
+                    newNextButton.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const currentIdx = parseInt(overlay.dataset.currentVideoIndex || '0', 10);
+                        this.navigateToVideo(overlay, currentIdx + 1);
+                    });
+                }
+            }
+        }
+
+        // Update URL
+        this.updateURL(newSeason, videoNumber);
+
+        // Update aria-label
+        overlay.setAttribute('aria-label', newVideo.title || 'Video Player');
     }
 
     /**
