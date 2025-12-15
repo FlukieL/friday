@@ -58,13 +58,19 @@ header h1 {
     background-color: #f8f8f8;
     border-bottom: 2px solid var(--border-color);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
     font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
 .tabs::-webkit-scrollbar {
     display: none;
+}
+
+/* Hide scrollbar for Firefox - supported in Firefox 64+ */
+@supports (scrollbar-width: none) {
+    .tabs {
+        scrollbar-width: none;
+    }
 }
 
 .tab-button {
@@ -414,8 +420,8 @@ main {
     justify-content: center;
     opacity: 0;
     transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 .video-overlay.active {
