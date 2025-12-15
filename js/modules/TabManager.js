@@ -25,6 +25,8 @@ class TabManager {
         const activeButton = document.querySelector('.tab-button.active');
         if (activeButton) {
             this.activeTab = activeButton.dataset.tab;
+            // Scroll initial active tab into view on mobile
+            setTimeout(() => this.scrollTabIntoView(activeButton), 100);
         }
 
         // Add event listeners
@@ -81,6 +83,9 @@ class TabManager {
         tabButton.setAttribute('aria-selected', 'true');
         tabContent.classList.add('active');
 
+        // Scroll the active tab into view (for mobile horizontal scrolling)
+        this.scrollTabIntoView(tabButton);
+
         // Animate transition
         if (currentActiveContent && tabContent) {
             await this.animations.fadeBetween(currentActiveContent, tabContent);
@@ -94,6 +99,34 @@ class TabManager {
         window.dispatchEvent(new CustomEvent('tabChanged', { 
             detail: { tabName } 
         }));
+    }
+
+    /**
+     * Scrolls a tab button into view within the tabs container
+     * @param {HTMLElement} tabButton - The tab button to scroll into view
+     */
+    scrollTabIntoView(tabButton) {
+        const tabsContainer = tabButton.closest('.tabs');
+        if (!tabsContainer) {
+            return;
+        }
+
+        const containerRect = tabsContainer.getBoundingClientRect();
+        const buttonRect = tabButton.getBoundingClientRect();
+
+        // Check if the button is outside the visible area
+        const isLeftOfView = buttonRect.left < containerRect.left;
+        const isRightOfView = buttonRect.right > containerRect.right;
+
+        if (isLeftOfView || isRightOfView) {
+            // Calculate scroll position to centre the button
+            const scrollLeft = tabButton.offsetLeft - (tabsContainer.offsetWidth / 2) + (tabButton.offsetWidth / 2);
+            
+            tabsContainer.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
+            });
+        }
     }
 
     /**
