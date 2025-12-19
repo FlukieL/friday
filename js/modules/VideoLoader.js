@@ -9,6 +9,23 @@ class VideoLoader {
         this.animations = animations;
         this.videos = [];
         this.videosBySeason = {};
+        // Director's commentary mapping for Season 1
+        this.commentaryUrl = 'https://www.youtube.com/watch?v=UYfQUiVz7Yg';
+        this.commentaryTimestamps = {
+            'hDaA-bs1wN4': '01:39', // Origin Still
+            'IRC0Jt1yazQ': '02:04', // Home First Video
+            'mT_3-rIx8DE': '02:22', // Turkey Walk (duplicate ID, different URL)
+            'nF7Bq0HzxDI': '02:38', // Turkey260625
+            'ZnKdQZrHD8U': '03:43', // Mario Pipe
+            'tFWvI3kelzI': '04:22', // Batman&Joker
+            '1EO_KqPksDw': '06:17', // LUKETVWeather
+            'Pgv0bjxUjKY': '07:20', // 241025
+            '3UBtcJOgBTs': '07:57', // cigar
+            'HTza944UJpY': '09:02', // Friday I'm In Love
+            'OCGycnEOndA': '10:17', // HarryPotter
+            'GSrBB1hNR4g': '12:15', // Shining
+            'qazMXc1nU8Y': '15:43'  // GhostsOfFridaysPast
+        };
     }
 
     /**
@@ -69,6 +86,12 @@ class VideoLoader {
                 });
 
                 container.appendChild(seasonGrid);
+
+                // Add director's commentary section for Season 1
+                if (season === '1') {
+                    const commentarySection = this.createCommentarySection();
+                    container.appendChild(commentarySection);
+                }
             });
 
             // Trigger staggered animations
@@ -149,6 +172,24 @@ class VideoLoader {
                 title.setAttribute('role', 'button');
                 title.setAttribute('tabindex', '0');
                 card.appendChild(title);
+            }
+
+            // Add commentary button for Season 1 videos
+            if (season === '1') {
+                // First try to match by URL ID (handles duplicate ID case)
+                const urlId = this.youtubeEmbed.extractVideoId(video.url);
+                let timestamp = this.commentaryTimestamps[urlId];
+                
+                // If not found by URL ID, try by video.id
+                if (!timestamp) {
+                    const videoIdForCommentary = video.id || urlId;
+                    timestamp = this.commentaryTimestamps[videoIdForCommentary];
+                }
+                
+                if (timestamp) {
+                    const commentaryButton = this.createCommentaryButton(video, timestamp);
+                    card.appendChild(commentaryButton);
+                }
             }
 
             // Add click handler to both card and title
@@ -566,6 +607,145 @@ class VideoLoader {
      */
     async updateVideoTitles(videos) {
         return await this.youtubeEmbed.fetchTitlesForVideos(videos);
+    }
+
+    /**
+     * Creates a commentary button for a video
+     * @param {Object} video - Video data object
+     * @param {string} timestamp - Timestamp in MM:SS format
+     * @returns {HTMLElement}
+     */
+    createCommentaryButton(video, timestamp) {
+        const button = document.createElement('button');
+        button.className = 'video-commentary-button';
+        button.setAttribute('aria-label', `Load director's commentary at ${timestamp}`);
+        button.innerHTML = `<span class="commentary-icon">🎬</span> <span class="commentary-text">Director's Commentary</span> <span class="commentary-timestamp">${timestamp}</span>`;
+        
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.openCommentary(timestamp);
+        });
+
+        return button;
+    }
+
+    /**
+     * Opens the director's commentary video at a specific timestamp
+     * @param {string} timestamp - Timestamp in MM:SS format
+     */
+    openCommentary(timestamp) {
+        // Convert MM:SS to seconds
+        const [minutes, seconds] = timestamp.split(':').map(Number);
+        const totalSeconds = minutes * 60 + seconds;
+
+        // Create commentary video data
+        const commentaryVideo = {
+            id: 'UYfQUiVz7Yg',
+            url: this.commentaryUrl,
+            aspectRatio: '16:9',
+            title: "Director's Commentary - Season 1",
+            startTime: totalSeconds
+        };
+
+        // Create overlay similar to expandVideo but for commentary
+        const existingOverlay = document.querySelector('.video-overlay');
+        if (existingOverlay) {
+            this.closeVideo(existingOverlay);
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'video-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', "Director's Commentary");
+
+        const expandedContainer = document.createElement('div');
+        expandedContainer.className = 'video-expanded-container';
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'video-close-button';
+        closeButton.setAttribute('aria-label', 'Close commentary');
+        closeButton.innerHTML = '×';
+        closeButton.addEventListener('click', () => this.closeVideo(overlay));
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.classList.contains('video-overlay')) {
+                e.stopPropagation();
+                this.closeVideo(overlay);
+            }
+        });
+
+        expandedContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.closeVideo(overlay);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+
+        // Create embed with timestamp
+        let embedContainer;
+        try {
+            embedContainer = this.youtubeEmbed.createEmbed(commentaryVideo);
+            embedContainer.classList.add('expanded-embed');
+        } catch (error) {
+            console.error('Error creating commentary embed:', error);
+            embedContainer = document.createElement('div');
+            embedContainer.className = 'video-error';
+            embedContainer.innerHTML = '<p>Failed to load commentary video</p>';
+        }
+
+        expandedContainer.appendChild(closeButton);
+        expandedContainer.appendChild(embedContainer);
+        overlay.appendChild(expandedContainer);
+
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+
+        this.setupAutoHideControls(overlay, closeButton, document.createElement('div'));
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+        });
+    }
+
+    /**
+     * Creates the director's commentary section for Season 1
+     * @returns {HTMLElement}
+     */
+    createCommentarySection() {
+        const section = document.createElement('div');
+        section.className = 'commentary-section';
+
+        const heading = document.createElement('h2');
+        heading.className = 'commentary-heading';
+        heading.textContent = "Director's Commentary";
+        section.appendChild(heading);
+
+        const description = document.createElement('p');
+        description.className = 'commentary-description';
+        description.textContent = "Watch the director's commentary for Season 1. Each video has a button above to jump directly to its commentary section.";
+        section.appendChild(description);
+
+        const commentaryButton = document.createElement('button');
+        commentaryButton.className = 'commentary-section-button';
+        commentaryButton.setAttribute('aria-label', "Load director's commentary");
+        commentaryButton.innerHTML = '<span class="commentary-icon">🎬</span> <span>Watch Director\'s Commentary</span>';
+        
+        commentaryButton.addEventListener('click', () => {
+            this.openCommentary('00:00');
+        });
+
+        section.appendChild(commentaryButton);
+
+        return section;
     }
 }
 

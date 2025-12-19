@@ -30,11 +30,16 @@ class YouTubeEmbed {
     /**
      * Generates YouTube embed URL
      * @param {string} videoId - YouTube video ID
+     * @param {number} startTime - Optional start time in seconds
      * @returns {string} Embed URL
      */
-    getEmbedUrl(videoId) {
+    getEmbedUrl(videoId, startTime = null) {
         if (!videoId) return '';
-        return `https://www.youtube.com/embed/${videoId}`;
+        let url = `https://www.youtube.com/embed/${videoId}`;
+        if (startTime !== null && startTime > 0) {
+            url += `?start=${Math.floor(startTime)}`;
+        }
+        return url;
     }
 
     /**
@@ -92,6 +97,7 @@ class YouTubeEmbed {
      * @param {string} videoData.id - Video ID
      * @param {string} videoData.url - Video URL
      * @param {string} videoData.aspectRatio - Aspect ratio (default: "16:9")
+     * @param {number} videoData.startTime - Optional start time in seconds
      * @returns {HTMLElement} Container div with embedded iframe
      */
     createEmbed(videoData) {
@@ -101,7 +107,8 @@ class YouTubeEmbed {
             throw new Error('Invalid video data: missing video ID or URL');
         }
 
-        const embedUrl = this.getEmbedUrl(videoId);
+        const startTime = videoData.startTime || null;
+        const embedUrl = this.getEmbedUrl(videoId, startTime);
         const aspectRatio = videoData.aspectRatio || '16:9';
         const paddingBottom = this.getAspectRatioPadding(aspectRatio);
 
