@@ -62,7 +62,7 @@ class ContentRenderer {
         if (character.firstAppearance) {
             const meta = document.createElement('p');
             meta.className = 'meta';
-            meta.textContent = `First Appearance: ${character.firstAppearance}`;
+            meta.innerHTML = `First Appearance: ${character.firstAppearance}`;
             item.appendChild(meta);
         }
 
