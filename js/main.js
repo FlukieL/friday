@@ -73,6 +73,7 @@ class FridaySagaApp {
         const tab = urlParams.get('tab');
         const season = urlParams.get('season');
         const video = urlParams.get('video');
+        const commentary = urlParams.get('commentary');
 
         // Restore tab if specified in URL
         if (tab) {
@@ -80,8 +81,15 @@ class FridaySagaApp {
             await this.handleTabChange(tab);
         }
 
-        // Restore video if season and video are specified
-        if (tab === 'videos' && season && video) {
+        // Restore commentary if season and commentary are specified
+        if (tab === 'videos' && season === '1' && commentary) {
+            // Wait a bit for videos to be rendered
+            setTimeout(() => {
+                this.videoLoader.openCommentaryFromURL(commentary);
+            }, 100);
+        }
+        // Restore video if season and video are specified (and not commentary)
+        else if (tab === 'videos' && season && video && !commentary) {
             const videoNumber = parseInt(video, 10);
             if (!isNaN(videoNumber)) {
                 // Wait a bit for videos to be rendered

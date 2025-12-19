@@ -112,10 +112,11 @@ class TabManager {
         const url = new URL(window.location);
         url.searchParams.set('tab', tabName);
         
-        // If switching away from videos, remove season and video params
+        // If switching away from videos, remove season, video, and commentary params
         if (tabName !== 'videos') {
             url.searchParams.delete('season');
             url.searchParams.delete('video');
+            url.searchParams.delete('commentary');
         }
         
         window.history.pushState({ tab: tabName }, '', url);

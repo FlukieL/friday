@@ -422,13 +422,21 @@ class VideoLoader {
      * Updates the URL with the current video selection
      * @param {string} season - Season number
      * @param {number} videoNumber - Video number within the season
+     * @param {string} commentaryTimestamp - Optional commentary timestamp in MM:SS format
      */
-    updateURL(season, videoNumber) {
+    updateURL(season, videoNumber, commentaryTimestamp = null) {
         const url = new URL(window.location);
         url.searchParams.set('tab', 'videos');
         url.searchParams.set('season', season);
-        url.searchParams.set('video', videoNumber.toString());
-        window.history.pushState({ tab: 'videos', season, video: videoNumber }, '', url);
+        if (commentaryTimestamp) {
+            url.searchParams.set('commentary', commentaryTimestamp);
+            // Remove video parameter when showing commentary
+            url.searchParams.delete('video');
+        } else {
+            url.searchParams.set('video', videoNumber.toString());
+            url.searchParams.delete('commentary');
+        }
+        window.history.pushState({ tab: 'videos', season, video: videoNumber, commentary: commentaryTimestamp }, '', url);
     }
 
     /**
@@ -446,6 +454,16 @@ class VideoLoader {
         
         if (card) {
             this.expandVideo(card, video, season, videoNumber);
+        }
+    }
+
+    /**
+     * Opens commentary based on URL parameters
+     * @param {string} timestamp - Timestamp in MM:SS format
+     */
+    openCommentaryFromURL(timestamp) {
+        if (timestamp) {
+            this.openCommentary(timestamp);
         }
     }
 
@@ -592,6 +610,7 @@ class VideoLoader {
         const currentTab = url.searchParams.get('tab') || 'videos';
         url.searchParams.delete('season');
         url.searchParams.delete('video');
+        url.searchParams.delete('commentary');
         window.history.pushState({ tab: currentTab }, '', url);
         
         setTimeout(() => {
@@ -700,34 +719,17 @@ class VideoLoader {
             embedContainer.innerHTML = '<p>Failed to load commentary video</p>';
         }
 
-        // Create URL display element
-        const urlContainer = document.createElement('div');
-        urlContainer.className = 'commentary-url-container';
-        
-        const urlLabel = document.createElement('span');
-        urlLabel.className = 'commentary-url-label';
-        urlLabel.textContent = 'URL: ';
-        
-        const urlLink = document.createElement('a');
-        urlLink.className = 'commentary-url-link';
-        urlLink.href = this.commentaryUrl;
-        urlLink.target = '_blank';
-        urlLink.rel = 'noopener noreferrer';
-        urlLink.textContent = this.commentaryUrl;
-        urlLink.setAttribute('aria-label', 'Open commentary URL in new tab');
-        
-        urlContainer.appendChild(urlLabel);
-        urlContainer.appendChild(urlLink);
-
         expandedContainer.appendChild(closeButton);
         expandedContainer.appendChild(embedContainer);
-        expandedContainer.appendChild(urlContainer);
         overlay.appendChild(expandedContainer);
 
         document.body.appendChild(overlay);
         document.body.style.overflow = 'hidden';
 
         this.setupAutoHideControls(overlay, closeButton, document.createElement('div'));
+
+        // Update URL with commentary information for Season 1
+        this.updateURL('1', null, timestamp);
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
