@@ -346,18 +346,6 @@ main {
     text-align: center;
 }
 
-.video-commentary-button .commentary-timestamp {
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.video-commentary-button:hover .commentary-timestamp {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
 /* Commentary Section */
 .commentary-section {
     margin-top: 3rem;

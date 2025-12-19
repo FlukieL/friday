@@ -618,8 +618,8 @@ class VideoLoader {
     createCommentaryButton(video, timestamp) {
         const button = document.createElement('button');
         button.className = 'video-commentary-button';
-        button.setAttribute('aria-label', `Load director's commentary at ${timestamp}`);
-        button.innerHTML = `<span class="commentary-icon">🎬</span> <span class="commentary-text">Director's Commentary</span> <span class="commentary-timestamp">${timestamp}</span>`;
+        button.setAttribute('aria-label', `Load commentary at ${timestamp}`);
+        button.innerHTML = `<span class="commentary-icon">🎬</span> <span class="commentary-text">Commentary</span>`;
         
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -644,7 +644,7 @@ class VideoLoader {
             id: 'UYfQUiVz7Yg',
             url: this.commentaryUrl,
             aspectRatio: '16:9',
-            title: "Director's Commentary - Season 1",
+            title: "Commentary - Season 1",
             startTime: totalSeconds
         };
 
@@ -658,7 +658,7 @@ class VideoLoader {
         overlay.className = 'video-overlay';
         overlay.setAttribute('role', 'dialog');
         overlay.setAttribute('aria-modal', 'true');
-        overlay.setAttribute('aria-label', "Director's Commentary");
+        overlay.setAttribute('aria-label', "Commentary");
 
         const expandedContainer = document.createElement('div');
         expandedContainer.className = 'video-expanded-container';
@@ -726,18 +726,18 @@ class VideoLoader {
 
         const heading = document.createElement('h2');
         heading.className = 'commentary-heading';
-        heading.textContent = "Director's Commentary";
+        heading.textContent = "Commentary";
         section.appendChild(heading);
 
         const description = document.createElement('p');
         description.className = 'commentary-description';
-        description.textContent = "Watch the director's commentary for Season 1. Each video has a button above to jump directly to its commentary section.";
+        description.textContent = "Watch the commentary for Season 1. Each video has a button above to jump directly to its commentary section.";
         section.appendChild(description);
 
         const commentaryButton = document.createElement('button');
         commentaryButton.className = 'commentary-section-button';
-        commentaryButton.setAttribute('aria-label', "Load director's commentary");
-        commentaryButton.innerHTML = '<span class="commentary-icon">🎬</span> <span>Watch Director\'s Commentary</span>';
+        commentaryButton.setAttribute('aria-label', "Load commentary");
+        commentaryButton.innerHTML = '<span class="commentary-icon">🎬</span> <span>Watch Commentary</span>';
         
         commentaryButton.addEventListener('click', () => {
             this.openCommentary('00:00');
