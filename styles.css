@@ -408,6 +408,41 @@ main {
     font-size: 1.2rem;
 }
 
+/* Commentary URL Container */
+.commentary-url-container {
+    padding: 1rem 1.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.commentary-url-label {
+    color: var(--text-color);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.commentary-url-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    word-break: break-all;
+    transition: var(--transition);
+}
+
+.commentary-url-link:hover {
+    text-decoration: underline;
+    color: #0052a3;
+}
+
+.commentary-url-link:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
 .video-loading {
     display: flex;
     align-items: center;

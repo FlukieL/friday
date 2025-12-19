@@ -700,8 +700,28 @@ class VideoLoader {
             embedContainer.innerHTML = '<p>Failed to load commentary video</p>';
         }
 
+        // Create URL display element
+        const urlContainer = document.createElement('div');
+        urlContainer.className = 'commentary-url-container';
+        
+        const urlLabel = document.createElement('span');
+        urlLabel.className = 'commentary-url-label';
+        urlLabel.textContent = 'URL: ';
+        
+        const urlLink = document.createElement('a');
+        urlLink.className = 'commentary-url-link';
+        urlLink.href = this.commentaryUrl;
+        urlLink.target = '_blank';
+        urlLink.rel = 'noopener noreferrer';
+        urlLink.textContent = this.commentaryUrl;
+        urlLink.setAttribute('aria-label', 'Open commentary URL in new tab');
+        
+        urlContainer.appendChild(urlLabel);
+        urlContainer.appendChild(urlLink);
+
         expandedContainer.appendChild(closeButton);
         expandedContainer.appendChild(embedContainer);
+        expandedContainer.appendChild(urlContainer);
         overlay.appendChild(expandedContainer);
 
         document.body.appendChild(overlay);
