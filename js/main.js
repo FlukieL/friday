@@ -37,6 +37,9 @@ class FridaySagaApp {
      */
     async start() {
         try {
+            // Clear expired cache entries
+            this.dataLoader.clearExpiredCache();
+
             // Initialise tab manager
             this.tabManager.init();
 
