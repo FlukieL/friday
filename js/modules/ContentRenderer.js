@@ -55,7 +55,7 @@ class ContentRenderer {
 
         if (character.description) {
             const description = document.createElement('p');
-            description.textContent = character.description;
+            description.innerHTML = character.description;
             item.appendChild(description);
         }
 
@@ -69,7 +69,7 @@ class ContentRenderer {
         if (character.details && Array.isArray(character.details)) {
             character.details.forEach(detail => {
                 const detailP = document.createElement('p');
-                detailP.textContent = detail;
+                detailP.innerHTML = detail;
                 item.appendChild(detailP);
             });
         }
@@ -133,10 +133,17 @@ class ContentRenderer {
             item.appendChild(examplesList);
         }
 
-        // Add expandable video embed if videoUrl is provided
+        // Add expandable video embeds if videoUrl or videoUrls are provided
         if (theme.videoUrl && this.youtubeEmbed) {
+            // Support legacy single videoUrl format
             const videoContainer = this.createExpandableVideoEmbed(theme.videoUrl);
             item.appendChild(videoContainer);
+        } else if (theme.videoUrls && Array.isArray(theme.videoUrls) && this.youtubeEmbed) {
+            // Support multiple videoUrls
+            theme.videoUrls.forEach((videoUrl, index) => {
+                const videoContainer = this.createExpandableVideoEmbed(videoUrl);
+                item.appendChild(videoContainer);
+            });
         }
 
         return item;

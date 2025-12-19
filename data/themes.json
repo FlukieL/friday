@@ -35,7 +35,10 @@
         "The series name directly references this cultural moment",
         "Lynch's influence on surreal storytelling resonates with the series' unique narrative style"
       ],
-      "videoUrl": "https://www.youtube.com/watch?v=SMDYRoYPzns"
+      "videoUrls": [
+        "https://www.youtube.com/watch?v=SMDYRoYPzns",
+        "https://www.youtube.com/watch?v=JPjh8bWTjtI"
+      ]
     }
   ]
 }
