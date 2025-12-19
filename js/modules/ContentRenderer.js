@@ -4,8 +4,9 @@
  */
 
 class ContentRenderer {
-    constructor(animations) {
+    constructor(animations, youtubeEmbed) {
         this.animations = animations;
+        this.youtubeEmbed = youtubeEmbed;
     }
 
     /**
@@ -132,7 +133,79 @@ class ContentRenderer {
             item.appendChild(examplesList);
         }
 
+        // Add expandable video embed if videoUrl is provided
+        if (theme.videoUrl && this.youtubeEmbed) {
+            const videoContainer = this.createExpandableVideoEmbed(theme.videoUrl);
+            item.appendChild(videoContainer);
+        }
+
         return item;
+    }
+
+    /**
+     * Creates an expandable video embed for themes
+     * @param {string} videoUrl - YouTube video URL
+     * @returns {HTMLElement}
+     */
+    createExpandableVideoEmbed(videoUrl) {
+        const container = document.createElement('div');
+        container.className = 'theme-video-container';
+
+        const videoId = this.youtubeEmbed.extractVideoId(videoUrl);
+        if (!videoId) {
+            console.warn('Invalid video URL:', videoUrl);
+            return container;
+        }
+
+        // Create toggle button
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'theme-video-toggle';
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.setAttribute('aria-label', 'Toggle video');
+        toggleButton.innerHTML = '<span class="theme-video-toggle-text">Show Video</span> <span class="theme-video-toggle-icon">▼</span>';
+        
+        // Create embed container (initially hidden)
+        const embedWrapper = document.createElement('div');
+        embedWrapper.className = 'theme-video-embed-wrapper';
+        embedWrapper.style.display = 'none';
+
+        const videoData = {
+            id: videoId,
+            url: videoUrl,
+            aspectRatio: '16:9'
+        };
+
+        try {
+            const embedContainer = this.youtubeEmbed.createEmbed(videoData);
+            embedWrapper.appendChild(embedContainer);
+        } catch (error) {
+            console.error('Error creating video embed:', error);
+            embedWrapper.innerHTML = '<p class="video-error">Failed to load video embed</p>';
+        }
+
+        // Toggle functionality
+        toggleButton.addEventListener('click', () => {
+            const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+            
+            if (isExpanded) {
+                // Collapse
+                embedWrapper.style.display = 'none';
+                toggleButton.setAttribute('aria-expanded', 'false');
+                toggleButton.querySelector('.theme-video-toggle-text').textContent = 'Show Video';
+                toggleButton.querySelector('.theme-video-toggle-icon').textContent = '▼';
+            } else {
+                // Expand
+                embedWrapper.style.display = 'block';
+                toggleButton.setAttribute('aria-expanded', 'true');
+                toggleButton.querySelector('.theme-video-toggle-text').textContent = 'Hide Video';
+                toggleButton.querySelector('.theme-video-toggle-icon').textContent = '▲';
+            }
+        });
+
+        container.appendChild(toggleButton);
+        container.appendChild(embedWrapper);
+
+        return container;
     }
 
     /**

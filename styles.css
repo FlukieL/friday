@@ -382,6 +382,67 @@ main {
     margin-left: 0.5rem;
 }
 
+/* Theme Video Embed */
+.theme-video-container {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.theme-video-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+.theme-video-toggle:hover {
+    background-color: #0052a3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.theme-video-toggle:active {
+    transform: translateY(0);
+}
+
+.theme-video-toggle:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.theme-video-toggle-text {
+    flex: 1;
+    text-align: left;
+}
+
+.theme-video-toggle-icon {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.theme-video-embed-wrapper {
+    margin-top: 1rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.theme-video-embed-wrapper .video-embed-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
 /* Loading States */
 .loading {
     text-align: center;

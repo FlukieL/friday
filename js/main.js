@@ -17,7 +17,7 @@ class FridaySagaApp {
         this.animations = new Animations();
         this.videoLoader = new VideoLoader(this.youtubeEmbed, this.animations);
         this.tabManager = new TabManager(this.animations);
-        this.contentRenderer = new ContentRenderer(this.animations);
+        this.contentRenderer = new ContentRenderer(this.animations, this.youtubeEmbed);
     }
 
     /**
