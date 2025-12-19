@@ -53,6 +53,17 @@ class ContentRenderer {
             title.appendChild(source);
         }
 
+        if (character.image) {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'character-image-container';
+            const image = document.createElement('img');
+            image.src = character.image;
+            image.alt = character.name;
+            image.className = 'character-image';
+            imageContainer.appendChild(image);
+            item.appendChild(imageContainer);
+        }
+
         if (character.description) {
             const description = document.createElement('p');
             description.innerHTML = character.description;

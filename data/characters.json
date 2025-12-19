@@ -3,6 +3,7 @@
     {
       "name": "Stephen the TV Reporter",
       "source": "LUKETV",
+      "image": "/media/Stephen1.png",
       "description": "Stephen is a recurring character who appears as a TV reporter in the Friday Saga series. Known for his professional yet often comedic reporting style, Stephen brings a unique perspective to the events unfolding in the saga.",
       "firstAppearance": "<a href=\"https://friday.lukeharper.co.uk/?tab=videos&season=1&video=7\" target=\"_blank\" rel=\"noopener noreferrer\">FridayLUKETVWeather</a>",
       "details": [
@@ -14,6 +15,7 @@
     {
       "name": "Yawanto",
       "source": "Ethereal Realm",
+      "image": "/media/Yawanto1.png",
       "description": "Yawanto is a ghost who whispers into the main character Luke's ear, encouraging him to continue making Friday videos. The character is accompanied by the soundtrack from <a href=\"https://youtu.be/NCuBalItZA8?t=21\" target=\"_blank\" rel=\"noopener noreferrer\">Annihilation</a>, which has since become a meme sound across the internet.",
       "firstAppearance": "<a href=\"https://friday.lukeharper.co.uk/?tab=videos&season=1&video=8\" target=\"_blank\" rel=\"noopener noreferrer\">241025</a>",
       "details": [
