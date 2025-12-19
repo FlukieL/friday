@@ -169,7 +169,15 @@ class ContentRenderer {
         toggleButton.className = 'theme-video-toggle';
         toggleButton.setAttribute('aria-expanded', 'false');
         toggleButton.setAttribute('aria-label', 'Toggle video');
-        toggleButton.innerHTML = '<span class="theme-video-toggle-text">Show Video</span> <span class="theme-video-toggle-icon">▼</span>';
+        const toggleText = document.createElement('span');
+        toggleText.className = 'theme-video-toggle-text';
+        toggleText.textContent = 'Show Video';
+        const toggleIcon = document.createElement('span');
+        toggleIcon.className = 'theme-video-toggle-icon';
+        toggleIcon.textContent = '▼';
+        toggleButton.appendChild(toggleText);
+        toggleButton.appendChild(document.createTextNode(' '));
+        toggleButton.appendChild(toggleIcon);
         
         // Create embed container (initially hidden)
         const embedWrapper = document.createElement('div');
@@ -190,6 +198,21 @@ class ContentRenderer {
             embedWrapper.innerHTML = '<p class="video-error">Failed to load video embed</p>';
         }
 
+        // Store references for toggle functionality
+        let videoTitle = null;
+
+        // Fetch YouTube title asynchronously
+        this.youtubeEmbed.fetchVideoTitle(videoUrl).then(title => {
+            if (title) {
+                videoTitle = title;
+                const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+                toggleText.textContent = isExpanded ? `Hide Video: ${title}` : `Show Video: ${title}`;
+                toggleButton.setAttribute('aria-label', `Toggle video: ${title}`);
+            }
+        }).catch(error => {
+            console.warn('Failed to fetch video title:', error);
+        });
+
         // Toggle functionality
         toggleButton.addEventListener('click', () => {
             const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
@@ -198,14 +221,14 @@ class ContentRenderer {
                 // Collapse
                 embedWrapper.style.display = 'none';
                 toggleButton.setAttribute('aria-expanded', 'false');
-                toggleButton.querySelector('.theme-video-toggle-text').textContent = 'Show Video';
-                toggleButton.querySelector('.theme-video-toggle-icon').textContent = '▼';
+                toggleText.textContent = videoTitle ? `Show Video: ${videoTitle}` : 'Show Video';
+                toggleIcon.textContent = '▼';
             } else {
                 // Expand
                 embedWrapper.style.display = 'block';
                 toggleButton.setAttribute('aria-expanded', 'true');
-                toggleButton.querySelector('.theme-video-toggle-text').textContent = 'Hide Video';
-                toggleButton.querySelector('.theme-video-toggle-icon').textContent = '▲';
+                toggleText.textContent = videoTitle ? `Hide Video: ${videoTitle}` : 'Hide Video';
+                toggleIcon.textContent = '▲';
             }
         });
 
