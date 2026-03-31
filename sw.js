@@ -24,6 +24,7 @@ const urlsToCache = [
 
 // Data files that should use network-first strategy
 const DATA_FILES = [
+  '/data/aprilfools.json',
   '/data/characters.json',
   '/data/jokes.json',
   '/data/themes.json',

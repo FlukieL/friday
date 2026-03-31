@@ -4,9 +4,11 @@
  */
 
 class VideoLoader {
-    constructor(youtubeEmbed, animations) {
+    constructor(youtubeEmbed, animations, options = {}) {
         this.youtubeEmbed = youtubeEmbed;
         this.animations = animations;
+        /** Tab slug used in URL query when opening videos from this loader (e.g. "videos", "aprilfools") */
+        this.urlTab = options.urlTab || 'videos';
         this.videos = [];
         this.videosBySeason = {};
         // Director's commentary mapping for Season 1
@@ -426,7 +428,7 @@ class VideoLoader {
      */
     updateURL(season, videoNumber, commentaryTimestamp = null) {
         const url = new URL(window.location);
-        url.searchParams.set('tab', 'videos');
+        url.searchParams.set('tab', this.urlTab);
         url.searchParams.set('season', season);
         if (commentaryTimestamp) {
             url.searchParams.set('commentary', commentaryTimestamp);
@@ -436,7 +438,7 @@ class VideoLoader {
             url.searchParams.set('video', videoNumber.toString());
             url.searchParams.delete('commentary');
         }
-        window.history.pushState({ tab: 'videos', season, video: videoNumber, commentary: commentaryTimestamp }, '', url);
+        window.history.pushState({ tab: this.urlTab, season, video: videoNumber, commentary: commentaryTimestamp }, '', url);
     }
 
     /**

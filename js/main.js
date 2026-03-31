@@ -16,6 +16,9 @@ class FridaySagaApp {
         this.youtubeEmbed = new YouTubeEmbed();
         this.animations = new Animations();
         this.videoLoader = new VideoLoader(this.youtubeEmbed, this.animations);
+        this.aprilFoolsVideoLoader = new VideoLoader(this.youtubeEmbed, this.animations, {
+            urlTab: 'aprilfools'
+        });
         this.tabManager = new TabManager(this.animations);
         this.contentRenderer = new ContentRenderer(this.animations, this.youtubeEmbed);
     }
@@ -97,6 +100,13 @@ class FridaySagaApp {
                     this.videoLoader.expandVideoFromURL(season, videoNumber);
                 }, 100);
             }
+        } else if (tab === 'aprilfools' && season && video && !commentary) {
+            const videoNumber = parseInt(video, 10);
+            if (!isNaN(videoNumber)) {
+                setTimeout(() => {
+                    this.aprilFoolsVideoLoader.expandVideoFromURL(season, videoNumber);
+                }, 100);
+            }
         }
     }
 
@@ -113,6 +123,26 @@ class FridaySagaApp {
         } catch (error) {
             console.error('Error loading videos:', error);
             videosGrid.innerHTML = '<div class="video-error">Failed to load videos. Please check your connection and try again.</div>';
+        }
+    }
+
+    /**
+     * Loads and renders April Fools videos
+     */
+    async loadAprilFools() {
+        const grid = document.getElementById('aprilfools-grid');
+        if (!grid) return;
+
+        if (grid.children.length > 0 && !grid.querySelector('.loading')) {
+            return;
+        }
+
+        try {
+            const data = await this.dataLoader.loadData('data/aprilfools.json');
+            await this.aprilFoolsVideoLoader.renderVideos(data.videos, grid);
+        } catch (error) {
+            console.error('Error loading April Fools videos:', error);
+            grid.innerHTML = '<div class="video-error">Failed to load April Fools videos. Please try again later.</div>';
         }
     }
 
@@ -134,6 +164,9 @@ class FridaySagaApp {
                     break;
                 case 'jokes':
                     await this.loadJokes();
+                    break;
+                case 'aprilfools':
+                    await this.loadAprilFools();
                     break;
             }
         } catch (error) {
