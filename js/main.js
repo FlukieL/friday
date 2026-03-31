@@ -139,7 +139,9 @@ class FridaySagaApp {
 
         try {
             const data = await this.dataLoader.loadData('data/aprilfools.json');
-            await this.aprilFoolsVideoLoader.renderVideos(data.videos, grid);
+            await this.aprilFoolsVideoLoader.renderVideos(data.videos, grid, {
+                seasonSort: 'desc'
+            });
         } catch (error) {
             console.error('Error loading April Fools videos:', error);
             grid.innerHTML = '<div class="video-error">Failed to load April Fools videos. Please try again later.</div>';

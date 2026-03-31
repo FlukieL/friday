@@ -31,11 +31,32 @@ class VideoLoader {
     }
 
     /**
+     * Sorts season keys for grouping (numeric strings compare as numbers).
+     * @param {string[]} keys - Season identifiers
+     * @param {'asc'|'desc'} direction
+     * @returns {string[]}
+     */
+    sortSeasonKeys(keys, direction = 'asc') {
+        return [...keys].sort((a, b) => {
+            const na = /^\d+$/.test(a) ? parseInt(a, 10) : null;
+            const nb = /^\d+$/.test(b) ? parseInt(b, 10) : null;
+            if (na !== null && nb !== null) {
+                return direction === 'desc' ? nb - na : na - nb;
+            }
+            return direction === 'desc'
+                ? b.localeCompare(a, undefined, { numeric: true })
+                : a.localeCompare(b, undefined, { numeric: true });
+        });
+    }
+
+    /**
      * Renders videos from data
      * @param {Array} videos - Array of video objects
      * @param {HTMLElement} container - Container element to render into
+     * @param {{ seasonSort?: 'asc'|'desc' }} [renderOptions]
      */
-    async renderVideos(videos, container) {
+    async renderVideos(videos, container, renderOptions = {}) {
+        const seasonSort = renderOptions.seasonSort || 'asc';
         if (!videos || videos.length === 0) {
             container.innerHTML = '<div class="loading">No videos found.</div>';
             return;
@@ -53,9 +74,6 @@ class VideoLoader {
             container.classList.remove('videos-grid');
             container.classList.add('videos-container-inner');
 
-            // Store videos for URL handling
-            this.videos = videosWithTitles;
-
             // Group videos by season
             this.videosBySeason = {};
             videosWithTitles.forEach(video => {
@@ -66,9 +84,16 @@ class VideoLoader {
                 this.videosBySeason[season].push(video);
             });
 
+            const seasonKeys = this.sortSeasonKeys(
+                Object.keys(this.videosBySeason),
+                seasonSort
+            );
+            // Flat order matches on-screen order (prev/next in overlay)
+            this.videos = seasonKeys.flatMap(s => this.videosBySeason[s]);
+
             // Render videos grouped by season
             let globalIndex = 0;
-            Object.keys(this.videosBySeason).sort().forEach(season => {
+            seasonKeys.forEach(season => {
                 // Create season heading
                 const seasonHeading = document.createElement('h2');
                 seasonHeading.className = 'season-heading';
